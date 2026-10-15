@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradePro · realistic trading UI</title>
+  <!-- Font Awesome for icons (clean, professional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: #0b0e14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* main dashboard card – realistic depth */
+    .dashboard {
+      max-width: 1440px;
+      width: 100%;
+      background: #12161f;
+      border-radius: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(2px);
+    }
+
+    /* top navigation bar */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      background: #0f131c;
+      border-bottom: 1px solid #1e2530;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, #00c9a7, #2d7ee7);
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+      box-shadow: 0 8px 18px -6px rgba(0, 201, 167, 0.3);
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+
+    .logo-text span {
+      color: #00c9a7;
+      font-weight: 500;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      background: #181e28;
+      padding: 4px;
+      border-radius: 40px;
+      border: 1px solid #262f3c;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #9aa6b5;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+    }
+
+    .nav-links a.active {
+      background: #262f3c;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-links a:hover {
+      color: #d1d9e6;
+    }
+
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .balance-badge {
+      background: #1a212b;
+      padding: 8px 16px;
+      border-radius: 40px;
+      border: 1px solid #2c3543;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #eef2f6;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .balance-badge i {
+      color: #00c9a7;
+      font-size: 16px;
+    }
+
+    .avatar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar-img {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(145deg, #2b3648, #1b222e);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: #b9c7da;
+      border: 1px solid #334052;
+      font-size: 15px;
+    }
+
+    /* main content grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1px;
+      background: #1a1f2b;
+    }
+
+    /* left side – chart & order book */
+    .left-panel {
+      background: #12161f;
+      padding: 22px 24px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* instrument header */
+    .instrument-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pair-info h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: white;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pair-info h1 i {
+      font-size: 16px;
+      color: #5b6b82;
+      background: #1e2531;
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .price-change {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .current-price {
+      font-size: 30px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    .change-badge {
+      background: rgba(0, 201, 167, 0.12);
+      color: #00c9a7;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .change-badge i {
+      font-size: 12px;
+    }
+
+    .timeframe-selector {
+      display: flex;
+      gap: 6px;
+      background: #181e28;
+      padding: 5px;
+      border-radius: 40px;
+      border: 1px solid #232b37;
+    }
+
+    .timeframe-selector button {
+      background: transparent;
+      border: none;
+      color: #8f9db0;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 30px;
+      cursor: default;
+      transition: 0.1s;
+      font-family: inherit;
+    }
+
+    .timeframe-selector button.active {
+      background: #2a3444;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* chart container – realistic, with fake candles */
+    .chart-container {
+      background: #0e121b;
+      border-radius: 24px;
+      border: 1px solid #222b38;
+      padding: 18px 16px 12px 16px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+      position: relative;
+      height: 260px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      color: #6b7a91;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+
+    .candle-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      padding: 8px 0 4px 0;
+      position: relative;
+    }
+
+    .candle {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      position: relative;
+    }
+
+    .candle .wick {
+      width: 2px;
+      background: #5d6e86;
+      flex-shrink: 0;
+    }
+
+    .candle .body {
+      width: 10px;
+      border-radius: 3px;
+      transition: 0.1s;
+      box-shadow: 0 0 6px rgba(0, 201, 167, 0.1);
+    }
+
+    .green .body {
+      background: #00c9a7;
+      box-shadow: 0 0 10px rgba(0, 201, 167, 0.3);
+    }
+
+    .red .body {
+      background: #f6465d;
+      box-shadow: 0 0 10px rgba(246, 70, 93, 0.25);
+    }
+
+    .green .wick {
+      background: #00b494;
+    }
+
+    .red .wick {
+      background: #d43d52;
+    }
+
+    /* order book / depth mini */
+    .depth-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .depth-card {
+      background: #0e121b;
+      border-radius: 18px;
+      border: 1px solid #222b38;
+      padding: 16px 14px;
+    }
+
+    .depth-card h3 {
+      color: #9aa6b5;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+    }
+
+    .depth-card h3 i {
+      font-size: 12px;
+      color: #4a5a73;
+    }
+
+    .depth-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 1px solid #1b222d;
+      font-weight: 500;
+    }
+
+    .depth-row:last-child {
+      border-bottom: none;
+    }
+
+    .depth-price {
+      color: #d1dbe8;
+      font-weight: 600;
+    }
+
+    .depth-amount {
+      color: #7a8a9f;
+      font-weight: 500;
+    }
+
+    .bid .depth-price {
+      color: #00c9a7;
+    }
+
+    .ask .depth-price {
+      color: #f6465d;
+    }
+
+    /* right panel – trading form */
+    .right-panel {
+      background: #0f131c;
+      padding: 24px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      border-left: 1px solid #1f2632;
+    }
+
+    .buy-sell-toggle {
+      display: flex;
+      background: #181e28;
+      border-radius: 40px;
+      padding: 5px;
+      border: 1px solid #252e3b;
+    }
+
+    .buy-sell-toggle button {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 12px 0;
+      font-weight: 600;
+      font-size: 15px;
+      border-radius: 32px;
+      color: #8e9db2;
+      cursor: default;
+      transition: 0.15s;
+      font-family: inherit;
+    }
+
+    .buy-sell-toggle button.active {
+      background: #00c9a7;
+      color: #0b0e14;
+      box-shadow: 0 8px 18px -6px rgba(0, 201, 167, 0.5);
+    }
+
+    .buy-sell-toggle button:last-child.active {
+      background: #f6465d;
+      color: white;
+      box-shadow: 0 8px 18px -6px rgba(246, 70, 93, 0.5);
+    }
+
+    .order-form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #7b8a9f;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-wrapper {
+      background: #0b0f16;
+      border: 1px solid #262f3c;
+      border-radius: 16px;
+      padding: 4px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: 0.1s;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: #3a4a60;
+    }
+
+    .input-wrapper input {
+      background: transparent;
+      border: none;
+      padding: 14px 0;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      width: 100%;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .input-wrapper input::placeholder {
+      color: #4c5a6e;
+      font-weight: 400;
+    }
+
+    .input-suffix {
+      color: #a0b0c4;
+      font-weight: 600;
+      font-size: 14px;
+      background: #1e2633;
+      padding: 6px 12px;
+      border-radius: 30px;
+    }
+
+    .percentage-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .percentage-buttons button {
+      background: #181e28;
+      border: 1px solid #262f3c;
+      color: #b3c0d2;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 0;
+      flex: 1;
+      border-radius: 30px;
+      cursor: default;
+      transition: 0.1s;
+      font-family: inherit;
+    }
+
+    .percentage-buttons button:hover {
+      background: #212a37;
+      color: white;
+    }
+
+    .order-summary {
+      background: #0b0f16;
+      border-radius: 18px;
+      padding: 18px 16px;
+      border: 1px solid #1f2835;
+      margin: 6px 0 4px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 6px 0;
+      color: #9ba9bc;
+    }
+
+    .summary-row.total {
+      border-top: 1px solid #232d3b;
+      margin-top: 10px;
+      padding-top: 16px;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .summary-value {
+      color: white;
+      font-weight: 500;
+    }
+
+    .total .summary-value {
+      color: #00c9a7;
+      font-size: 18px;
+    }
+
+    .action-button {
+      background: #00c9a7;
+      border: none;
+      border-radius: 40px;
+      padding: 18px 0;
+      font-weight: 700;
+      font-size: 17px;
+      color: #0b0e14;
+      cursor: default;
+      transition: 0.15s;
+      letter-spacing: 0.2px;
+      font-family: inherit;
+      box-shadow: 0 12px 24px -8px rgba(0, 201, 167, 0.4);
+      margin-top: 4px;
+    }
+
+    .action-button.sell-mode {
+      background: #f6465d;
+      color: white;
+      box-shadow: 0 12px 24px -8px rgba(246, 70, 93, 0.4);
+    }
+
+    .action-button i {
+      margin-right: 8px;
+    }
+
+    /* bottom stats bar */
+    .stats-bar {
+      background: #0f131c;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 30px;
+      border-top: 1px solid #1e2530;
+      color: #8998ad;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-item i {
+      color: #00c9a7;
+      font-size: 14px;
+    }
+
+    .stat-item span {
+      color: #d6e0ec;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .market-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #b9c7da;
+    }
+
+    .market-status .dot {
+      width: 8px;
+      height: 8px;
+      background: #00c9a7;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #00c9a7;
+    }
+
+    /* subtle responsive fallback */
+    @media (max-width: 1000px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .right-panel {
+        border-left: none;
+        border-top: 1px solid #1f2632;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .navbar {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .nav-links {
+        order: 3;
+        width: 100%;
+      }
+      .balance-badge {
+        padding: 6px 12px;
+      }
+      .pair-info h1 {
+        font-size: 22px;
+      }
+    }
+
+    /* custom scroll (none needed) */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- top navbar -->
+    <div class="navbar">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="logo-text">Trade<span>Pro</span></div>
+      </div>
+
+      <div class="nav-links">
+        <a href="#" class="active">Trade</a>
+        <a href="#">Portfolio</a>
+        <a href="#">Markets</a>
+        <a href="#">History</a>
+      </div>
+
+      <div class="user-area">
+        <div class="balance-badge">
+          <i class="fas fa-wallet"></i> $12,845.32
+        </div>
+        <div class="avatar">
+          <div class="avatar-img">JD</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- main content -->
+    <div class="main-grid">
+      <!-- left panel: chart + depth -->
+      <div class="left-panel">
+        <!-- instrument header -->
+        <div class="instrument-header">
+          <div class="pair-info">
+            <h1>BTC / USD <i class="fas fa-chevron-down"></i></h1>
+            <div class="price-change">
+              <span class="current-price">$63,842.10</span>
+              <span class="change-badge"><i class="fas fa-caret-up"></i> +2.34%</span>
+            </div>
+          </div>
+          <div class="timeframe-selector">
+            <button class="active">1m</button>
+            <button>5m</button>
+            <button>15m</button>
+            <button>1h</button>
+            <button>1D</button>
+          </div>
+        </div>
+
+        <!-- chart area with candles -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <span>BTC/USD · 1m</span>
+            <span>Volume 1.2K</span>
+          </div>
+          <div class="candle-wrapper">
+            <!-- candle 1 -->
+            <div class="candle green">
+              <div class="wick" style="height: 22px;"></div>
+              <div class="body" style="height: 38px;"></div>
+            </div>
+            <!-- candle 2 -->
+            <div class="candle red">
+              <div class="wick" style="height: 18px;"></div>
+              <div class="body" style="height: 28px;"></div>
+            </div>
+            <!-- candle 3 -->
+            <div class="candle green">
+              <div class="wick" style="height: 28px;"></div>
+              <div class="body" style="height: 52px;"></div>
+            </div>
+            <!-- candle 4 -->
+            <div class="candle green">
+              <div class="wick" style="height: 14px;"></div>
+              <div class="body" style="height: 44px;"></div>
+            </div>
+            <!-- candle 5 -->
+            <div class="candle red">
+              <div class="wick" style="height: 16px;"></div>
+              <div class="body" style="height: 20px;"></div>
+            </div>
+            <!-- candle 6 -->
+            <div class="candle green">
+              <div class="wick" style="height: 24px;"></div>
+              <div class="body" style="height: 62px;"></div>
+            </div>
+            <!-- candle 7 -->
+            <div class="candle red">
+              <div class="wick" style="height: 12px;"></div>
+              <div class="body" style="height: 18px;"></div>
+            </div>
+            <!-- candle 8 -->
+            <div class="candle green">
+              <div class="wick" style="height: 30px;"></div>
+              <div class="body" style="height: 48px;"></div>
+            </div>
+          </div>
+          <!-- subtle y-axis lines (visual only) -->
+          <div style="position: absolute; left: 20px; right: 20px; bottom: 8px; display: flex; justify-content: space-between; font-size: 10px; color: #3e4b5e; pointer-events: none;">
+            <span>09:30</span><span>10:00</span><span>10:30</span><span>11:00</span>
+          </div>
+        </div>
+
+        <!-- depth / order book snapshot -->
+        <div class="depth-section">
+          <div class="depth-card">
+            <h3><i class="fas fa-arrow-down"></i> Bids</h3>
+            <div class="depth-row bid">
+              <span class="depth-price">$63,842.10</span>
+              <span class="depth-amount">1.24 BTC</span>
+            </div>
+            <div class="depth-row bid">
+              <span class="depth-price">$63,838.50</span>
+              <span class="depth-amount">3.67 BTC</span>
+            </div>
+            <div class="depth-row bid">
+              <span class="depth-price">$63,832.20</span>
+              <span class="depth-amount">0.95 BTC</span>
+            </div>
+            <div class="depth-row bid">
+              <span class="depth-price">$63,825.75</span>
+              <span class="depth-amount">2.13 BTC</span>
+            </div>
+          </div>
+          <div class="depth-card">
+            <h3><i class="fas fa-arrow-up"></i> Asks</h3>
+            <div class="depth-row ask">
+              <span class="depth-price">$63,849.30</span>
+              <span class="depth-amount">0.87 BTC</span>
+            </div>
+            <div class="depth-row ask">
+              <span class="depth-price">$63,856.20</span>
+              <span class="depth-amount">2.45 BTC</span>
+            </div>
+            <div class="depth-row ask">
+              <span class="depth-price">$63,862.80</span>
+              <span class="depth-amount">1.92 BTC</span>
+            </div>
+            <div class="depth-row ask">
+              <span class="depth-price">$63,870.00</span>
+              <span class="depth-amount">4.03 BTC</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- right panel: trading form -->
+      <div class="right-panel">
+        <div class="buy-sell-toggle">
+          <button class="active">Buy</button>
+          <button>Sell</button>
+        </div>
+
+        <div class="order-form">
+          <div class="input-group">
+            <label>Price</label>
+            <div class="input-wrapper">
+              <input type="text" value="63,842.10" readonly>
+              <span class="input-suffix">USD</span>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Amount</label>
+            <div class="input-wrapper">
+              <input type="text" value="0.25" placeholder="0.00">
+              <span class="input-suffix">BTC</span>
+            </div>
+            <div class="percentage-buttons">
+              <button>25%</button>
+              <button>50%</button>
+              <button>75%</button>
+              <button>Max</button>
+            </div>
+          </div>
+
+          <div class="order-summary">
+            <div class="summary-row">
+              <span>Order value</span>
+              <span class="summary-value">$15,960.52</span>
+            </div>
+            <div class="summary-row">
+              <span>Fee (0.1%)</span>
+              <span class="summary-value">$15.96</span>
+            </div>
+            <div class="summary-row total">
+              <span>Total</span>
+              <span class="summary-value">$15,976.48</span>
+            </div>
+          </div>
+
+          <button class="action-button">
+            <i class="fas fa-bolt"></i> Buy BTC
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- bottom stats -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <i class="fas fa-chart-simple"></i> 24h Vol <span>$2.84B</span>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-arrow-up"></i> 24h High <span>$64,210</span>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-arrow-down"></i> 24h Low <span>$62,150</span>
+      </div>
+      <div class="market-status">
+        <span class="dot"></span> Market open · live
+      </div>
+    </div>
+  </div>
+</body>
+</html>
